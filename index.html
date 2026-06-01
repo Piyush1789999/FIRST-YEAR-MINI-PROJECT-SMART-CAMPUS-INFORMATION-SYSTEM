@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Smart Campus System</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,serif;background:#1a1a1a;color:#e8e4dc;min-height:100vh;display:flex}
+
+.sidebar{width:200px;min-height:100vh;background:#111;border-right:1px solid #2a2a2a;padding:0;flex-shrink:0;position:fixed;top:0;left:0;height:100vh;overflow-y:auto}
+.logo{padding:24px 20px 20px;border-bottom:1px solid #2a2a2a}
+.logo h1{font-size:14px;font-weight:normal;color:#fff;letter-spacing:1px;text-transform:uppercase}
+.logo p{font-size:11px;color:#555;margin-top:3px}
+.nav-section{padding:20px 0 8px}
+.nav-section-label{font-size:10px;color:#444;letter-spacing:2px;text-transform:uppercase;padding:0 20px 8px}
+.nav-btn{display:block;width:100%;text-align:left;padding:9px 20px;font-size:13px;color:#888;background:none;border:none;cursor:pointer;font-family:Georgia,serif;transition:color .15s,background .15s}
+.nav-btn:hover{color:#ccc;background:#1a1a1a}
+.nav-btn.on{color:#e8e4dc;background:#1f1f1f;border-left:2px solid #c8a96e}
+
+.main{margin-left:200px;flex:1;padding:36px 40px;min-height:100vh}
+.pg{display:none}.pg.on{display:block}
+
+.ph{margin-bottom:28px}
+.ph h2{font-size:22px;font-weight:normal;color:#fff}
+.ph p{font-size:13px;color:#666;margin-top:5px}
+
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat{background:#111;border:1px solid #2a2a2a;padding:20px;border-radius:4px}
+.stat-label{font-size:11px;color:#555;letter-spacing:1.5px;text-transform:uppercase}
+.stat-val{font-size:32px;color:#c8a96e;font-weight:normal;margin:8px 0 4px;font-family:Courier,monospace}
+.stat-sub{font-size:12px;color:#555}
+
+.card{background:#111;border:1px solid #2a2a2a;border-radius:4px;margin-bottom:20px;overflow:hidden}
+.card-top{padding:14px 20px;border-bottom:1px solid #1e1e1e;display:flex;justify-content:space-between;align-items:center}
+.card-top h3{font-size:13px;font-weight:normal;color:#ccc;letter-spacing:.5px}
+.card-top span{font-size:11px;color:#555;font-family:Courier,monospace}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{text-align:left;padding:10px 20px;font-size:10px;color:#555;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid #1e1e1e;font-weight:normal;background:#0d0d0d}
+tbody tr{border-bottom:1px solid #1a1a1a;transition:background .1s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:#161616}
+td{padding:11px 20px;color:#aaa;vertical-align:middle}
+td:first-child{color:#ccc;font-family:Courier,monospace;font-size:12px}
+
+.badge{display:inline-block;padding:2px 8px;font-size:11px;font-family:Courier,monospace;border-radius:2px}
+.g-A{background:#1a2e1a;color:#5a9a5a;border:1px solid #2a4a2a}
+.g-B{background:#1a2040;color:#5a80c0;border:1px solid #2a3060}
+.g-C{background:#2e2810;color:#b09040;border:1px solid #4a3e18}
+.g-D{background:#2e1e10;color:#b06030;border:1px solid #4a3020}
+.g-F{background:#2e1010;color:#b04040;border:1px solid #4a2020}
+
+.form-wrap{padding:20px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fg{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.fg.full{grid-column:1/-1}
+label{font-size:11px;color:#555;letter-spacing:1.5px;text-transform:uppercase}
+input,select{background:#0d0d0d;border:1px solid #2a2a2a;color:#e8e4dc;padding:9px 12px;font-size:13px;font-family:Georgia,serif;border-radius:3px;outline:none;transition:border-color .15s}
+input:focus,select:focus{border-color:#c8a96e}
+select option{background:#111}
+.btn-row{display:flex;gap:10px;margin-top:4px}
+.btn{padding:9px 20px;font-size:13px;font-family:Georgia,serif;border-radius:3px;cursor:pointer;border:1px solid #2a2a2a;transition:all .15s}
+.btn-gold{background:#c8a96e;color:#111;border-color:#c8a96e}
+.btn-gold:hover{background:#d4b87a}
+.btn-ghost{background:transparent;color:#888;border-color:#2a2a2a}
+.btn-ghost:hover{border-color:#555;color:#ccc}
+
+.empty{text-align:center;padding:40px;color:#444;font-size:13px;font-style:italic}
+
+.bar-chart{padding:20px;display:flex;align-items:flex-end;gap:10px;min-height:200px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.bar{width:100%;border-radius:2px 2px 0 0;transition:height .5s ease;min-height:3px}
+.bar-n{font-size:11px;color:#555;text-align:center;word-break:break-word}
+.bar-v{font-size:12px;color:#888;font-family:Courier,monospace}
+
+.fee-out{margin:0 20px 20px;background:#0d0d0d;border:1px solid #2a2a2a;border-radius:3px;padding:16px;display:none}
+.fee-out.show{display:block}
+.fee-line{display:flex;justify-content:space-between;padding:7px 0;font-size:13px;border-bottom:1px solid #1a1a1a;color:#888}
+.fee-line:last-child{border-bottom:none;color:#c8a96e;font-size:15px}
+.fee-line span:last-child{font-family:Courier,monospace}
+
+.grade-bars{padding:20px;display:flex;flex-direction:column;gap:10px}
+.gb-row{display:flex;align-items:center;gap:12px;font-size:12px}
+.gb-lbl{width:20px;font-family:Courier,monospace;color:#888}
+.gb-bar{height:6px;border-radius:2px;min-width:3px;transition:width .5s ease}
+.gb-cnt{color:#444;margin-left:auto;font-family:Courier,monospace}
+
+.stat2{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px}
+.s2{background:#0d0d0d;border:1px solid #1e1e1e;border-radius:3px;padding:14px}
+.s2-label{font-size:10px;color:#444;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.s2-val{font-size:18px;color:#c8a96e;font-family:Courier,monospace}
+
+.toast{position:fixed;bottom:24px;right:24px;background:#c8a96e;color:#111;padding:10px 18px;font-size:13px;border-radius:3px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:999;font-family:Georgia,serif}
+.toast.show{opacity:1;transform:translateY(0)}
+
+.search-row{display:flex;gap:10px;padding:14px 20px;border-bottom:1px solid #1e1e1e}
+.search-row input{flex:1}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="logo">
+    <h1>Smart Campus System</h1>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-btn on" onclick="go('dash',this)">Dashboard</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Students</div>
+    <button class="nav-btn" onclick="go('reg',this)">Register</button>
+    <button class="nav-btn" onclick="go('rec',this)">All Records</button>
+    <button class="nav-btn" onclick="go('srch',this)">Search &amp; Sort</button>
+  </div>
+  <div class="nav-section">
+    <div class="nav-section-label">Academics</div>
+    <button class="nav-btn" onclick="go('enr',this)">Course Enroll</button>
+    <button class="nav-btn" onclick="go('fee',this)">Fee Calculator</button>
+    <button class="nav-btn" onclick="go('perf',this)">Performance</button>
+  </div>
+</aside>
+
+<main class="main">
+
+<div id="pg-dash" class="pg on">
+  <div class="ph"><h2>Dashboard</h2><p>Overview of all student records</p></div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-label">Students</div><div class="stat-val" id="s-total">0</div><div class="stat-sub">registered</div></div>
+    <div class="stat"><div class="stat-label">Avg Score</div><div class="stat-val" id="s-avg">—</div><div class="stat-sub">class average</div></div>
+    <div class="stat"><div class="stat-label">Top Score</div><div class="stat-val" id="s-top">—</div><div class="stat-sub" id="s-top-name">—</div></div>
+    <div class="stat"><div class="stat-label">Below 40</div><div class="stat-val" id="s-fail">0</div><div class="stat-sub">students</div></div>
+  </div>
+  <div class="card">
+    <div class="card-top"><h3>Recent Students</h3><span id="d-cnt">0 total</span></div>
+    <div id="dash-body"><div class="empty">No students yet. Register one to get started.</div></div>
+  </div>
+</div>
+
+<div id="pg-reg" class="pg">
+  <div class="ph"><h2>Register Student</h2><p>Lab 1 — registration and grade evaluation</p></div>
+  <div class="card">
+    <div class="form-wrap">
+      <div class="row2">
+        <div class="fg"><label>Student ID</label><input id="r-id" type="text" placeholder="e.g. S001"/></div>
+        <div class="fg"><label>Full Name</label><input id="r-name" type="text" placeholder="e.g. Riya Patel"/></div>
+        <div class="fg"><label>Age</label><input id="r-age" type="number" placeholder="18"/></div>
+        <div class="fg"><label>Exam Score (0–100)</label><input id="r-score" type="number" placeholder="75" min="0" max="100"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="doRegister()">Register Student</button>
+        <button class="btn btn-ghost" onclick="clearReg()">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pg-rec" class="pg">
+  <div class="ph"><h2>All Records</h2><p>Lab 3 — complete student data</p></div>
+  <div class="card">
+    <div class="card-top"><h3>Registered Students</h3><span id="rc-cnt">0 entries</span></div>
+    <div id="rec-body"><div class="empty">No students yet.</div></div>
+  </div>
+</div>
+
+<div id="pg-srch" class="pg">
+  <div class="ph"><h2>Search &amp; Sort</h2><p>Lab 4 — bubble sort and linear/binary search</p></div>
+  <div class="card">
+    <div class="search-row">
+      <input type="text" id="q" placeholder="Search by name or ID…" oninput="doSearch()"/>
+      <select id="sk" onchange="doSearch()">
+        <option value="id">Sort by ID</option>
+        <option value="name">Sort by Name</option>
+        <option value="score">Sort by Score</option>
+      </select>
+      <select id="sd" onchange="doSearch()">
+        <option value="asc">A → Z</option>
+        <option value="desc">Z → A</option>
+      </select>
+    </div>
+    <div id="srch-body"><div class="empty">No results.</div></div>
+  </div>
+</div>
+
+<div id="pg-enr" class="pg">
+  <div class="ph"><h2>Course Enrollment</h2><p>Lab 2 — add up to 5 courses per student</p></div>
+  <div class="card">
+    <div class="form-wrap">
+      <div class="fg full"><label>Student ID</label><input id="e-id" type="text" placeholder="Enter existing student ID"/></div>
+      <div class="row2">
+        <div class="fg"><label>Course Name</label><input id="e-course" type="text" placeholder="e.g. Data Structures"/></div>
+        <div class="fg"><label>Credits</label><input id="e-cr" type="number" placeholder="3" min="1"/></div>
+      </div>
+      <div class="btn-row"><button class="btn btn-gold" onclick="doEnroll()">Add Course</button></div>
+    </div>
+  </div>
+  <div class="card" id="enr-preview" style="display:none">
+    <div class="card-top"><h3 id="enr-sname">Courses</h3><span id="enr-cnt">0 / 5</span></div>
+    <div id="enr-body"></div>
+  </div>
+</div>
+
+<div id="pg-fee" class="pg">
+  <div class="ph"><h2>Fee Calculator</h2><p>Lab 5 — tuition, hostel, transport</p></div>
+  <div class="card">
+    <div class="form-wrap">
+      <div class="row2">
+        <div class="fg"><label>Tuition Fee (₹)</label><input id="f-t" type="number" placeholder="50000"/></div>
+        <div class="fg"><label>Hostel Fee (₹)</label><input id="f-h" type="number" placeholder="20000"/></div>
+        <div class="fg full"><label>Transport Fee (₹)</label><input id="f-r" type="number" placeholder="5000"/></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-gold" onclick="calcFee()">Calculate</button>
+        <button class="btn btn-ghost" onclick="clearFee()">Clear</button>
+      </div>
+    </div>
+    <div class="fee-out" id="fee-out">
+      <div class="fee-line"><span>Tuition Fee</span><span id="fo-t">—</span></div>
+      <div class="fee-line"><span>Hostel Fee</span><span id="fo-h">—</span></div>
+      <div class="fee-line"><span>Transport Fee</span><span id="fo-r">—</span></div>
+      <div class="fee-line"><span>Total</span><span id="fo-total">—</span></div>
+    </div>
+  </div>
+</div>
+
+<div id="pg-perf" class="pg">
+  <div class="ph"><h2>Performance Analysis</h2><p>Lab 8 — statistics and grade distribution</p></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-top"><h3>Score Chart</h3><span>by student</span></div>
+      <div class="bar-chart" id="p-chart"><div class="empty" style="width:100%;padding:30px 0">Need 2+ students.</div></div>
+    </div>
+    <div class="card">
+      <div class="card-top"><h3>Grade Distribution</h3><span>count per grade</span></div>
+      <div class="grade-bars" id="p-grades"><div class="empty">No data.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-top"><h3>Statistics</h3><span>numpy-style analysis</span></div>
+    <div class="stat2" id="p-stats">
+      <div class="s2"><div class="s2-label">Mean</div><div class="s2-val">—</div></div>
+      <div class="s2"><div class="s2-label">Median</div><div class="s2-val">—</div></div>
+      <div class="s2"><div class="s2-label">Std Dev</div><div class="s2-val">—</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let students=[];
+
+function go(page,btn){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  document.getElementById('pg-'+page).classList.add('on');
+  btn.classList.add('on');
+  if(page==='dash')renderDash();
+  if(page==='rec')renderRec();
+  if(page==='srch')doSearch();
+  if(page==='perf')renderPerf();
+}
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function grade(s){
+  if(s>=90)return{g:'A',r:'Excellent'};
+  if(s>=75)return{g:'B',r:'Very Good'};
+  if(s>=60)return{g:'C',r:'Good'};
+  if(s>=40)return{g:'D',r:'Average'};
+  return{g:'F',r:'Needs Improvement'};
+}
+
+function doRegister(){
+  const id=document.getElementById('r-id').value.trim();
+  const name=document.getElementById('r-name').value.trim();
+  const age=document.getElementById('r-age').value.trim();
+  const score=parseFloat(document.getElementById('r-score').value);
+  if(!id||!name||!age||isNaN(score)){toast('Fill in all fields.');return;}
+  if(score<0||score>100){toast('Score must be 0–100.');return;}
+  if(students.find(s=>s.id===id)){toast('ID already exists.');return;}
+  const{g,r}=grade(score);
+  students.push({id,name,age,score,g,r,courses:[]});
+  toast(name+' registered — Grade '+g);
+  clearReg();
+}
+function clearReg(){['r-id','r-name','r-age','r-score'].forEach(i=>document.getElementById(i).value='');}
+
+function renderDash(){
+  const n=students.length;
+  document.getElementById('s-total').textContent=n;
+  document.getElementById('s-fail').textContent=students.filter(s=>s.score<40).length;
+  document.getElementById('d-cnt').textContent=n+' total';
+  if(!n){document.getElementById('s-avg').textContent='—';document.getElementById('s-top').textContent='—';document.getElementById('s-top-name').textContent='—';document.getElementById('dash-body').innerHTML='<div class="empty">No students yet.</div>';return;}
+  const avg=(students.reduce((a,s)=>a+s.score,0)/n).toFixed(1);
+  const top=students.reduce((a,b)=>a.score>b.score?a:b);
+  document.getElementById('s-avg').textContent=avg;
+  document.getElementById('s-top').textContent=top.score;
+  document.getElementById('s-top-name').textContent=top.name;
+  const rows=[...students].slice(-8).reverse();
+  document.getElementById('dash-body').innerHTML='<table><thead><tr><th>ID</th><th>Name</th><th>Score</th><th>Grade</th><th>Remark</th></tr></thead><tbody>'+
+    rows.map(s=>`<tr><td>${s.id}</td><td style="color:#ccc">${s.name}</td><td>${s.score}</td><td><span class="badge g-${s.g}">${s.g}</span></td><td style="font-size:12px;color:#555">${s.r}</td></tr>`).join('')+'</tbody></table>';
+}
+
+function renderRec(){
+  document.getElementById('rc-cnt').textContent=students.length+' entries';
+  if(!students.length){document.getElementById('rec-body').innerHTML='<div class="empty">No students yet.</div>';return;}
+  document.getElementById('rec-body').innerHTML='<table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Score</th><th>Grade</th><th>Courses</th></tr></thead><tbody>'+
+    students.map(s=>`<tr><td>${s.id}</td><td style="color:#ccc">${s.name}</td><td>${s.age}</td><td>${s.score}</td><td><span class="badge g-${s.g}">${s.g}</span></td><td style="color:#444;font-size:12px">${s.courses.length?s.courses.map(c=>c[0]).join(', '):'—'}</td></tr>`).join('')+'</tbody></table>';
+}
+
+function doSearch(){
+  const q=document.getElementById('q').value.toLowerCase();
+  const sk=document.getElementById('sk').value;
+  const sd=document.getElementById('sd').value;
+  let arr=students.filter(s=>s.id.toLowerCase().includes(q)||s.name.toLowerCase().includes(q));
+  for(let i=0;i<arr.length;i++)
+    for(let j=0;j<arr.length-i-1;j++)
+      if((arr[j][sk]>arr[j+1][sk])===(sd==='asc')){let t=arr[j];arr[j]=arr[j+1];arr[j+1]=t;}
+  const body=document.getElementById('srch-body');
+  if(!arr.length){body.innerHTML='<div class="empty">No results found.</div>';return;}
+  body.innerHTML='<table><thead><tr><th>ID</th><th>Name</th><th>Score</th><th>Grade</th></tr></thead><tbody>'+
+    arr.map(s=>`<tr><td>${s.id}</td><td style="color:#ccc">${s.name}</td><td>${s.score}</td><td><span class="badge g-${s.g}">${s.g}</span></td></tr>`).join('')+'</tbody></table>';
+}
+
+function doEnroll(){
+  const sid=document.getElementById('e-id').value.trim();
+  const course=document.getElementById('e-course').value.trim();
+  const cr=parseInt(document.getElementById('e-cr').value);
+  const st=students.find(s=>s.id===sid);
+  if(!st){toast('Student ID not found.');return;}
+  if(!course){toast('Enter a course name.');return;}
+  if(isNaN(cr)||cr<=0){toast('Enter valid credits.');return;}
+  if(st.courses.length>=5){toast('Max 5 courses reached.');return;}
+  st.courses.push([course,cr]);
+  toast('"'+course+'" added to '+st.name);
+  document.getElementById('e-course').value='';
+  document.getElementById('e-cr').value='';
+  document.getElementById('enr-preview').style.display='block';
+  document.getElementById('enr-sname').textContent=st.name+"'s courses";
+  document.getElementById('enr-cnt').textContent=st.courses.length+' / 5';
+  document.getElementById('enr-body').innerHTML='<table><thead><tr><th>#</th><th>Course</th><th>Credits</th></tr></thead><tbody>'+
+    st.courses.map((c,i)=>`<tr><td style="color:#444">${i+1}</td><td style="color:#ccc">${c[0]}</td><td style="color:#888;font-family:Courier,monospace">${c[1]}</td></tr>`).join('')+'</tbody></table>';
+}
+
+function calcFee(){
+  const t=parseFloat(document.getElementById('f-t').value)||0;
+  const h=parseFloat(document.getElementById('f-h').value)||0;
+  const r=parseFloat(document.getElementById('f-r').value)||0;
+  const total=t+h+r;
+  const fmt=v=>'₹'+v.toLocaleString('en-IN');
+  document.getElementById('fo-t').textContent=fmt(t);
+  document.getElementById('fo-h').textContent=fmt(h);
+  document.getElementById('fo-r').textContent=fmt(r);
+  document.getElementById('fo-total').textContent=fmt(total);
+  document.getElementById('fee-out').classList.add('show');
+}
+function clearFee(){['f-t','f-h','f-r'].forEach(i=>document.getElementById(i).value='');document.getElementById('fee-out').classList.remove('show');}
+
+const barColors=['#c8a96e','#7a9fc8','#8ec87a','#c87a7a','#9a7ac8','#7ac8b8'];
+function renderPerf(){
+  if(students.length<2){
+    document.getElementById('p-chart').innerHTML='<div class="empty" style="width:100%;padding:30px 0">Need 2+ students.</div>';
+    document.getElementById('p-grades').innerHTML='<div class="empty">No data.</div>';
+    document.getElementById('p-stats').innerHTML='<div class="s2"><div class="s2-label">Mean</div><div class="s2-val">—</div></div><div class="s2"><div class="s2-label">Median</div><div class="s2-val">—</div></div><div class="s2"><div class="s2-label">Std Dev</div><div class="s2-val">—</div></div>';
+    return;
+  }
+  const H=160;
+  document.getElementById('p-chart').innerHTML=students.map((s,i)=>{
+    const h=Math.max(4,(s.score/100)*H);
+    return`<div class="bar-col"><div class="bar-v">${s.score}</div><div class="bar" style="height:${h}px;background:${barColors[i%barColors.length]}"></div><div class="bar-n">${s.name.split(' ')[0]}</div></div>`;
+  }).join('');
+  const dist={A:0,B:0,C:0,D:0,F:0};
+  students.forEach(s=>dist[s.g]++);
+  const dclr={A:'#5a9a5a',B:'#5a80c0',C:'#b09040',D:'#b06030',F:'#b04040'};
+  const mx=Math.max(...Object.values(dist),1);
+  document.getElementById('p-grades').innerHTML=Object.entries(dist).map(([g,c])=>
+    `<div class="gb-row"><span class="gb-lbl">${g}</span><div class="gb-bar" style="width:${Math.max(3,(c/mx)*160)}px;background:${dclr[g]}"></div><span class="gb-cnt">${c}</span></div>`
+  ).join('');
+  const sc=students.map(s=>s.score);
+  const mean=sc.reduce((a,b)=>a+b,0)/sc.length;
+  const sorted=[...sc].sort((a,b)=>a-b);
+  const m=Math.floor(sorted.length/2);
+  const median=sorted.length%2?sorted[m]:(sorted[m-1]+sorted[m])/2;
+  const std=Math.sqrt(sc.reduce((s,x)=>s+Math.pow(x-mean,2),0)/sc.length);
+  const top=students.reduce((a,b)=>a.score>b.score?a:b);
+  document.getElementById('p-stats').innerHTML=
+    `<div class="s2"><div class="s2-label">Mean</div><div class="s2-val">${mean.toFixed(1)}</div></div>`+
+    `<div class="s2"><div class="s2-label">Median</div><div class="s2-val">${median.toFixed(1)}</div></div>`+
+    `<div class="s2"><div class="s2-label">Std Dev</div><div class="s2-val">${std.toFixed(2)}</div></div>`+
+    `<div class="s2"><div class="s2-label">Highest</div><div class="s2-val">${top.score}</div></div>`+
+    `<div class="s2"><div class="s2-label">Top Student</div><div class="s2-val" style="font-size:13px">${top.name}</div></div>`+
+    `<div class="s2"><div class="s2-label">Total</div><div class="s2-val">${students.length}</div></div>`;
+}
+</script>
+</body>
+</html>
